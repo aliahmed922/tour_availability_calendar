@@ -31,9 +31,6 @@ group :development, :test do
 end
 
 group :development do
-  # Use 'Annotate-Models' to summarizing the current schema to the top or bottom of your models
-  gem 'annotate'
-
   gem 'listen', '>= 3.0.5', '< 3.2'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
