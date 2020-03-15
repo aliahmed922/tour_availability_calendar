@@ -72,5 +72,6 @@ end
 #  recurring_mday           :integer
 #  recurring_mday_week      :integer
 #  recurring_end_date       :date
+#  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #
