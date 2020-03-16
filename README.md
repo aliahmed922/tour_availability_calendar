@@ -38,8 +38,7 @@ POST - Create Tour
 | recurring_interval_value | Integer  | True  | ---                        | Number of interval E.g 1 or 2
 | recurring_interval_unit  | String   | True                               | --- | day / week / month / year | Recurring interval unit
 | recurring_option_trigger | String   | False                              | --- | on_same_day / every_week / on_current_week_day | `on_same_day` will only work when `recurring_interval_unit` value is either `week` or `month`. This will repeat the tour on same day of the `start_at` date. `every_week_day` will work only when `recurring_interval_unit` value is  `week`. This will repeat on every day of the week. `on_current_week_day` will only work when `recurring_interval_unit` value is `month`. This will repeat tour on same week, same day of the repeating month (E.g Every second Thursday of the month).
-| recurring_end_date       | Date     | False. True only if 
-                                        `recurring_interval_value` is `on` | --- | Date in format (YYYY-MM-DD).
+| recurring_end_date       | Date     | False. True only if `recurring_interval_value` is `on` | --- | Date in format (YYYY-MM-DD).
 | recurring_wdays          | Array    | False | Range 0 to 6               | Values from 0..6. These values represent the week days as 0 = Sunday, 1 = Monday etc
 
 
