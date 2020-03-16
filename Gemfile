@@ -44,7 +44,8 @@ group :development do
 end
 
 group :test do
-  gem 'shoulda', '~> 3.5'
+  gem 'shoulda'
+  gem 'shoulda-matchers'
   # Clean Database before/after test suites
   gem 'database_cleaner', '~> 1.7'
   # Create records for Test Env

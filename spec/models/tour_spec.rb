@@ -4,6 +4,26 @@ RSpec.describe Tour, type: :model do
   let(:start_at) { DateTime.new(2020, 02, 20) }
   subject { FactoryBot.build(:tour) }
 
+  describe 'Enums' do
+    it do
+      should define_enum_for(:recurrence).
+        with_values(described_class::RECURRENCE).
+        backed_by_column_of_type(:string)
+    end
+
+    it do
+      should define_enum_for(:recurring_interval_unit).
+        with_values(described_class::REPEATING_INTERVAL_UNITS).
+        backed_by_column_of_type(:string)
+    end
+
+    it do
+      should define_enum_for(:recurring_option_trigger).
+        with_values(described_class::RECURRING_OPTIONS).
+        backed_by_column_of_type(:string)
+    end
+  end
+
   describe 'Validations' do
     before do
       subject.assign_attributes(recurrence: described_class::RECURRENCE[:once])
