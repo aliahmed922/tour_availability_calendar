@@ -88,7 +88,6 @@ class Tour < ApplicationRecord
 
   # Instance Methods
   #
-
   def never_ending?
     recurring? and recurring_end_value == END_OPTIONS[:never]
   end
