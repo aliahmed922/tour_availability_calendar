@@ -72,7 +72,7 @@ RSpec.describe Tour, type: :model do
       end
 
       it 'is valid when recurring_wdays not match weekday range' do
-        subject.recurring_wdays = [subject.decorate.week_day_by_name[:monday], subject.decorate.week_day_by_name[:saturday]]
+        subject.recurring_wdays = [subject.decorate.week_days_by_name[:monday], subject.decorate.week_days_by_name[:saturday]]
         expect(subject).to be_valid
       end
 
@@ -96,6 +96,30 @@ RSpec.describe Tour, type: :model do
       it 'is valid with recurring_end_date when recurring can be ended' do
         subject.recurring_end_value = described_class::END_OPTIONS[:on]
         subject.recurring_end_date  = subject.end_at
+        expect(subject).to be_valid
+      end
+
+      it 'is not valid with invalid recurring_option_trigger value when interval is weekly' do
+        subject.recurring_interval_unit = described_class::REPEATING_INTERVAL_UNITS[:week]
+        subject.recurring_option_trigger = described_class::RECURRING_OPTIONS[:on_current_week_day]
+        expect(subject).to_not be_valid
+      end
+
+      it 'is not valid with invalid recurring_option_trigger value when interval is monthly' do
+        subject.recurring_interval_unit = described_class::REPEATING_INTERVAL_UNITS[:monthly]
+        subject.recurring_option_trigger = described_class::RECURRING_OPTIONS[:every_week_day]
+        expect(subject).to_not be_valid
+      end
+
+      it 'is valid with valid recurring_option_trigger value when interval is weekly' do
+        subject.recurring_interval_unit = described_class::REPEATING_INTERVAL_UNITS[:week]
+        subject.recurring_option_trigger = described_class::RECURRING_OPTIONS[:every_week_day]
+        expect(subject).to be_valid
+      end
+
+      it 'is valid with valid recurring_option_trigger value when interval is monthly' do
+        subject.recurring_interval_unit = described_class::REPEATING_INTERVAL_UNITS[:month]
+        subject.recurring_option_trigger = described_class::RECURRING_OPTIONS[:on_current_week_day]
         expect(subject).to be_valid
       end
     end
@@ -133,6 +157,41 @@ RSpec.describe Tour, type: :model do
 
         end
 
+        context '#trigger_recurring_option' do
+          context 'Weekly' do
+            before { subject.recurring_interval_unit = described_class::REPEATING_INTERVAL_UNITS[:week] }
+
+            it 'changes week days to same day, extract from start date day' do
+              subject.recurring_option_trigger = described_class::RECURRING_OPTIONS[:on_same_day]
+              subject.save
+              expect(subject.recurring_wdays).to match_array([subject.start_at.wday].map(&:to_s))
+            end
+
+            it 'changes week days to every week day' do
+              subject.recurring_option_trigger = described_class::RECURRING_OPTIONS[:every_week_day]
+              subject.save
+              expect(subject.recurring_wdays).to match_array(described_class::WEEK_DAYS_RANGE.to_a.map(&:to_s))
+            end
+          end
+
+          context 'Monthly' do
+            before { subject.recurring_interval_unit = described_class::REPEATING_INTERVAL_UNITS[:month] }
+
+            it 'changes month day to same day of the month, extract from start date day' do
+              subject.recurring_option_trigger = described_class::RECURRING_OPTIONS[:on_same_day]
+              subject.save
+              expect(subject.recurring_mday).to eq(subject.start_at.mday)
+            end
+
+            it 'changes week day and week of month, extract from start date' do
+              subject.recurring_option_trigger = described_class::RECURRING_OPTIONS[:on_current_week_day]
+              subject.save
+              expect(subject.recurring_wdays).to match_array([subject.start_at.wday.to_s])
+              expect(subject.recurring_mday_week).to eq(subject.start_at.week_of_month)
+            end
+          end
+        end
+
         context '#change_week_day_to_default!' do
           before { subject.recurring_interval_unit = described_class::REPEATING_INTERVAL_UNITS[:week] }
 
@@ -143,7 +202,7 @@ RSpec.describe Tour, type: :model do
           end
 
           it 'does not change week day to default when week days are assigned' do
-            days = Array.wrap([subject.decorate.week_day_by_name[:monday], subject.decorate.week_day_by_name[:wednesday]])
+            days = Array.wrap([subject.decorate.week_days_by_name[:monday], subject.decorate.week_days_by_name[:wednesday]])
             subject.recurring_wdays = days
             subject.save
             expect(subject.recurring_wdays).to match_array(days.map(&:to_s))
@@ -153,16 +212,9 @@ RSpec.describe Tour, type: :model do
         context '#change_to_default_month_day' do
           before { subject.recurring_interval_unit = described_class::REPEATING_INTERVAL_UNITS[:month] }
 
-          it 'changes month day to default, extract from start date day when month day is not assigned or nil' do
-            subject.recurring_mday = nil
+          it 'changes month day, extract from start date day, when interval is monthly' do
             subject.save
             expect(subject.recurring_mday).to eq(subject.start_at.mday)
-          end
-
-          it 'does not change month day to default when month day is assigned' do
-            subject.recurring_mday = subject.start_at.beginning_of_month.mday
-            subject.save
-            expect(subject.recurring_mday).to eq(subject.start_at.beginning_of_month.mday)
           end
         end
 
@@ -217,6 +269,117 @@ RSpec.describe Tour, type: :model do
         )
 
         expect(subject.recurring_wdays).to match_array([0, 2, 3].map(&:to_s))
+      end
+    end
+
+    context '#trigger_recurring_option' do
+      before do
+        subject.assign_attributes(recurrence: described_class::RECURRENCE[:recurring], recurring_interval_value: 1)
+      end
+
+      it 'triggers recurring option as same day of week' do
+        subject.assign_attributes(
+          recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:week],
+          recurring_option_trigger: described_class::RECURRING_OPTIONS[:on_same_day]
+        )
+
+        subject.trigger_recurring_option
+        expect(subject.recurring_wdays).to match_array([subject.start_at.wday].map(&:to_s))
+      end
+
+      it 'triggers recurring option as every day of week' do
+        subject.assign_attributes(
+          recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:week],
+          recurring_option_trigger: described_class::RECURRING_OPTIONS[:every_week_day]
+        )
+        subject.trigger_recurring_option
+        expect(subject.recurring_wdays).to match_array(described_class::WEEK_DAYS_RANGE.to_a.map(&:to_s))
+      end
+
+      it 'triggers recurring option as same day of every month' do
+        subject.assign_attributes(
+          recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:month],
+          recurring_option_trigger: described_class::RECURRING_OPTIONS[:on_same_day]
+        )
+        subject.trigger_recurring_option
+        expect(subject.recurring_mday).to eq(subject.start_at.mday)
+      end
+
+      it 'triggers recurring option as same day and same week every month' do
+        subject.assign_attributes(
+          recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:month],
+          recurring_option_trigger: described_class::RECURRING_OPTIONS[:on_current_week_day]
+        )
+        subject.trigger_recurring_option
+        expect(subject.recurring_wdays).to match_array([subject.start_at.wday].map(&:to_s))
+        expect(subject.recurring_mday_week).to eq(subject.start_at.week_of_month)
+      end
+    end
+
+    context '#change_week_day_to_default!' do
+      before do
+        subject.assign_attributes(recurrence: described_class::RECURRENCE[:recurring], recurring_interval_value: 1)
+      end
+
+      it 'changes #recurring_wdays to default when interval is week' do
+        subject.assign_attributes(recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:week])
+        subject.change_week_day_to_default!
+        expect(subject.recurring_wdays).to match_array([subject.start_at.wday].map(&:to_s))
+      end
+
+      it 'changes #recurring_wdays to default when interval is monthly' do
+        subject.assign_attributes(recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:month])
+        subject.change_week_day_to_default!
+        expect(subject.recurring_wdays).to match_array([subject.start_at.wday].map(&:to_s))
+      end
+
+      it 'does nothing when interval is not weekly or monthly' do
+        subject.assign_attributes(recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:day])
+        expect(subject.change_week_day_to_default!).to be_nil
+        expect(subject.recurring_wdays).to be_empty
+      end
+
+      it 'does nothing when #recurring_wdays is present' do
+        subject.assign_attributes(recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:week])
+        subject.recurring_wdays = [subject.decorate.week_days_by_name[:monday]]
+        expect(subject.change_week_day_to_default!).to be_nil
+        expect(subject.recurring_wdays).to match_array([subject.decorate.week_days_by_name[:monday].to_s])
+      end
+    end
+
+    context '#chang_month_day_to_default!!' do
+      before do
+        subject.assign_attributes(recurrence: described_class::RECURRENCE[:recurring], recurring_interval_value: 1)
+      end
+
+      it 'changes #recurring_mday to default when interval is monthly' do
+        subject.assign_attributes(recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:month])
+        subject.chang_month_day_to_default!
+        expect(subject.recurring_mday).to eq(subject.start_at.mday)
+      end
+
+      it 'does nothing when interval is not monthly' do
+        subject.assign_attributes(recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:day])
+        expect(subject.chang_month_day_to_default!).to be_nil
+        expect(subject.recurring_mday).to be_nil
+      end
+    end
+
+    context '#set_month_day_week!!!' do
+      before do
+        subject.assign_attributes(recurrence: described_class::RECURRENCE[:recurring], recurring_interval_value: 1)
+      end
+
+      it 'changes #recurring_mday_week to default when interval is monthly' do
+        subject.assign_attributes(recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:month])
+        subject.set_month_day_week!
+        expect(subject.recurring_mday_week).to eq(subject.start_at.week_of_month)
+      end
+
+      it 'does nothing when interval is not monthly' do
+        subject.assign_attributes(recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:day])
+        expect(subject.set_month_day_week!).to be_nil
+        expect(subject.recurring_mday_week).to be_nil
       end
     end
   end
