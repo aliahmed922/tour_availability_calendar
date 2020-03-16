@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Tour, type: :decorator do
+RSpec.describe TourDecorator, type: :decorator do
   subject { FactoryBot.build(:tour).decorate }
 
   context '#week_days_by_name' do
