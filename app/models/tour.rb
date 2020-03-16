@@ -29,6 +29,7 @@ class Tour < ApplicationRecord
     on_current_week_day: 'on_current_week_day'
   }
 
+  # Triggers that will set Specific Week Days / Month Days / Week of the month based on RECURRING_OPTIONS
   RECURRING_OPTION_TRIGGERS = {
     REPEATING_INTERVAL_UNITS[:week].to_sym => {
       RECURRING_OPTIONS[:on_same_day].to_sym => -> (tour ) { tour.change_week_day_to_default! },
