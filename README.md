@@ -1,24 +1,18 @@
-# README
+# Simple Tour Availability Calendar
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Requirements
 
-Things you may want to cover:
+* Ruby 2.6.3
+* Rails 6.0.0
+* PostgreSQL
 
-* Ruby version
+### App Installation
 
-* System dependencies
+Once Rails/Ruby installed, app can be configured by following below steps:
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+1. Clone the repo `git clone https://github.com/aliahmed922/tour_availability_calendar.git`
+2. `cd` to 'tour_availability_calendar.git'
+3. Run `bundle`
+4. Configure Postgres Env Vars `export POSTGRES_USERNAME=<your postgres username>` and `export POSTGRES_PASSWORD=<your postgres password>`
+5. Run `rails db:create db:migrate`
+6. Run test cases `rspec`
