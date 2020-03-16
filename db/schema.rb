@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(version: 2020_03_15_150824) do
     t.string "recurring_end_value", default: "never", null: false
     t.string "recurring_interval_value", default: "0"
     t.string "recurring_interval_unit"
-    t.integer "recurring_wday"
+    t.text "recurring_wdays", default: [], array: true
     t.integer "recurring_mday"
     t.integer "recurring_mday_week"
     t.date "recurring_end_date"

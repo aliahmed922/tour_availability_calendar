@@ -14,13 +14,13 @@ class CreateTours < ActiveRecord::Migration[6.0]
       t.string :recurring_interval_value, default: 0
       # Interval unit of recurring tour. E.g Day, Week
       t.string :recurring_interval_unit
-      # Day number of the week (1 -> Monday, 2 -> Tuesday etc) in a given week when recurring_interval_unit is Week
+      # Number of the week days (1 -> Monday, 2 -> Tuesday etc) in a given week when recurring_interval_unit is Week
       # E.g If given, Every 1 Week, then default day would be extracted from the selected start_date value i.e (if start date is Feb 20, 2020 then day would be 4 -> Thursday)
-      t.integer :recurring_wday
+      t.text :recurring_wdays, array: true, default: []
       # Number of days in a given month when recurring_interval_unit is Month
       # E.g If given, Every 1 Month, then default day would be extracted from the selected start date value i.e (if start date is Feb 20, 2020 then day would be 20)
       t.integer :recurring_mday
-      # Week number of the month from start date E.g (if start date is Feb 20, 2020 then the week number would be 3)
+      # Week number of the month from start date E.g (if start date is Feb 20, 2020 then the week number would be 4)
       t.integer :recurring_mday_week
       # Date on which the recurring event will be cancelled
       t.date :recurring_end_date
