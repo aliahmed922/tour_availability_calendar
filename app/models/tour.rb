@@ -35,7 +35,7 @@ class Tour < ApplicationRecord
       RECURRING_OPTIONS[:every_week_day].to_sym => -> (tour) { tour.recurring_wdays = WEEK_DAYS_RANGE.to_a }
     },
     REPEATING_INTERVAL_UNITS[:month].to_sym => {
-      RECURRING_OPTIONS[:on_same_day].to_sym => -> (tour) { tour.chang_month_day_to_default! },
+      RECURRING_OPTIONS[:on_same_day].to_sym => -> (tour) { tour.set_month_day_to_default! },
       RECURRING_OPTIONS[:on_current_week_day].to_sym => lambda do |tour|
         tour.set_month_day_week!
         tour.change_week_day_to_default!
@@ -81,7 +81,7 @@ class Tour < ApplicationRecord
   # Callbacks
   #
   before_save :change_hours_to_beginning_and_end_day_hours!, if: :full_day?
-  before_save :change_week_day_to_default!, :chang_month_day_to_default!, :set_month_day_week!, if: -> record { record.recurring? and record.recurring_option_trigger.nil? }
+  before_save :change_week_day_to_default!, :set_month_day_to_default!, :set_month_day_week!, if: -> record { record.recurring? and record.recurring_option_trigger.nil? }
   before_save :trigger_recurring_option, if: :recurring?
 
   # Class Methods
@@ -101,24 +101,28 @@ class Tour < ApplicationRecord
     super(value&.sort&.uniq)
   end
 
+  # Performs on before, that sets the week day or month day based on trigger value
   def trigger_recurring_option
     recurring_option_trigger.nil? and return
 
     RECURRING_OPTION_TRIGGERS[recurring_interval_unit.to_sym][recurring_option_trigger.to_sym].(self)
   end
 
+  # Change week to start_at weekday
   def change_week_day_to_default!
     !weekly? and !monthly? or recurring_wdays.present? and return
 
     self.recurring_wdays = Array.wrap([start_at.wday])
   end
 
-  def chang_month_day_to_default!
+  # Set month day to start_at month day
+  def set_month_day_to_default!
     !monthly? and return
 
     self.recurring_mday = start_at.mday
   end
 
+  # Set week of month to start_at month week
   def set_month_day_week!
     !monthly? and return
 
@@ -181,4 +185,5 @@ end
 #  recurring_end_date       :date
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
+#  recurring_option_trigger :stringg
 #

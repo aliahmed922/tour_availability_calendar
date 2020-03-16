@@ -382,25 +382,25 @@ RSpec.describe Tour, type: :model do
       end
     end
 
-    context '#chang_month_day_to_default!!' do
+    context '#set_month_day_to_default!' do
       before do
         subject.assign_attributes(recurrence: described_class::RECURRENCE[:recurring], recurring_interval_value: 1)
       end
 
       it 'changes #recurring_mday to default when interval is monthly' do
         subject.assign_attributes(recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:month])
-        subject.chang_month_day_to_default!
+        subject.set_month_day_to_default!
         expect(subject.recurring_mday).to eq(subject.start_at.mday)
       end
 
       it 'does nothing when interval is not monthly' do
         subject.assign_attributes(recurring_interval_unit: described_class::REPEATING_INTERVAL_UNITS[:day])
-        expect(subject.chang_month_day_to_default!).to be_nil
+        expect(subject.set_month_day_to_default!).to be_nil
         expect(subject.recurring_mday).to be_nil
       end
     end
 
-    context '#set_month_day_week!!!' do
+    context '#set_month_day_week!' do
       before do
         subject.assign_attributes(recurrence: described_class::RECURRENCE[:recurring], recurring_interval_value: 1)
       end
