@@ -58,7 +58,7 @@ class Tour < ApplicationRecord
 
   # Callbacks
   #
-  before_save :change_hours_to_initial_hours!, unless: :full_day?
+  before_save :change_hours_to_initial_hours!, if: :full_day?
   before_save :change_week_day_to_default!, :chang_month_day_to_default!, :set_month_day_week!, if: :recurring?
 
   # Class Methods
@@ -133,7 +133,7 @@ end
 #  recurring_end_value      :string           not null, default("never")
 #  recurring_interval_value :integer          default(0)
 #  recurring_interval_unit  :string
-#  recurring_wdays           :integer
+#  recurring_wdays          :text             array, default([])
 #  recurring_mday           :integer
 #  recurring_mday_week      :integer
 #  recurring_end_date       :date

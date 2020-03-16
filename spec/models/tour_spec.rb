@@ -111,13 +111,13 @@ RSpec.describe Tour, type: :model do
           end
 
           it 'changes start and end at hours to initial hours when tour is full day' do
+            subject.full_day = true
             subject.save
             expect(subject.start_at.hour).to eq(0)
             expect(subject.end_at.hour).to eq(0)
           end
 
           it 'does not change start and end at hours to initial hours when tour is not full day' do
-            subject.full_day = true
             subject.save
             expect(subject.start_at.hour).to eq(8)
             expect(subject.end_at.hour).to eq(8)
