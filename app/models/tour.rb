@@ -58,7 +58,7 @@ class Tour < ApplicationRecord
 
   # Callbacks
   #
-  before_save :change_hours_to_initial_hours!, if: :full_day?
+  before_save :change_hours_to_beginning_and_end_day_hours!, if: :full_day?
   before_save :change_week_day_to_default!, :chang_month_day_to_default!, :set_month_day_week!, if: :recurring?
 
   # Class Methods
@@ -100,17 +100,17 @@ class Tour < ApplicationRecord
       self.recurring_mday_week = start_at.week_of_month
     end
 
-    def change_hours_to_initial_hours!
+    def change_hours_to_beginning_and_end_day_hours!
       start_at.blank? or end_at.blank? and return
 
-      self.start_at = self.start_at.change(hour: 0)
-      self.end_at   = self.end_at.change(hour: 0)
+      self.start_at = self.start_at.beginning_of_day
+      self.end_at   = self.end_at.end_of_day
     end
 
     def end_date_is_after_start_date
       start_at.blank? or end_at.blank? and return
 
-      end_at <= start_at and errors.add(:end_date, 'cannot be before the start date')
+      end_at < start_at and errors.add(:end_date, 'cannot be before the start date')
     end
 
     def limit_recurring_wdays

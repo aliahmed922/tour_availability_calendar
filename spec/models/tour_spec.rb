@@ -41,7 +41,7 @@ RSpec.describe Tour, type: :model do
 
     it 'is valid when end at is after or equal to start at' do
       subject.end_at = subject.start_at
-      expect(subject).to_not be_valid
+      expect(subject).to be_valid
     end
 
     context 'Recurring' do
@@ -104,23 +104,23 @@ RSpec.describe Tour, type: :model do
   describe 'Callbacks' do
     context 'Before Save' do
       context 'One Time' do
-        context '#change_hours_to_initial_hours' do
+        context '#change_hours_to_beginning_and_end_day_hours!' do
           before do
-            subject.start_at = subject.start_at.change(hour: 8)
-            subject.end_at   = subject.end_at.change(hour: 8)
+            subject.start_at = DateTime.strptime('2020-02-20T06:30 AM', '%Y-%m-%dT%I:%M %p')
+            subject.end_at   = DateTime.strptime('2020-02-20T09:30 PM', '%Y-%m-%dT%I:%M %p')
           end
 
           it 'changes start and end at hours to initial hours when tour is full day' do
             subject.full_day = true
             subject.save
-            expect(subject.start_at.hour).to eq(0)
-            expect(subject.end_at.hour).to eq(0)
+            expect(subject.start_at.strftime('%I:%M %p')).to eq('12:00 AM')
+            expect(subject.end_at.strftime('%I:%M %p')).to eq('11:59 PM')
           end
 
           it 'does not change start and end at hours to initial hours when tour is not full day' do
             subject.save
-            expect(subject.start_at.hour).to eq(8)
-            expect(subject.end_at.hour).to eq(8)
+            expect(subject.start_at.strftime('%I:%M %p')).to eq('06:30 AM')
+            expect(subject.end_at.strftime('%I:%M %p')).to eq('09:30 PM')
           end
         end
       end
