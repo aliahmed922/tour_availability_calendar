@@ -53,10 +53,9 @@ class ToursController < ApplicationController
                                    :recurrence,
                                    :recurring_end_value,
                                    :recurring_interval_value,
-                                   :recurring_wday,
-                                   :recurring_wday,
-                                   :recurring_mday,
-                                   :recurring_mday_week,
-                                   :recurring_end_date)
+                                   :recurring_interval_unit,
+                                   :recurring_option_trigger,
+                                   :recurring_end_date,
+                                   recurring_wdays: [])
     end
 end
