@@ -48,6 +48,7 @@ class Tour < ApplicationRecord
 
   # Scopes
   #
+  scope :next_tours, -> { where(arel_table[:start_at].gteq(DateTime.now.beginning_of_day)) }
 
   # Enums
   #

@@ -250,6 +250,19 @@ RSpec.describe Tour, type: :model do
     end
   end
 
+  describe 'Scopes' do
+    context '.next_tours' do
+      it 'gets next upcoming tours' do
+        FactoryBot.create(:tour)
+
+        FactoryBot.create(:tour, start_at: DateTime.now.beginning_of_day)
+        FactoryBot.create(:tour, start_at: DateTime.now.beginning_of_day + 2.days)
+        FactoryBot.create(:tour, start_at: DateTime.now.beginning_of_day + 5.days)
+
+        expect(described_class.next_tours.count).to eq(3)
+      end
+    end
+  end
 
   describe 'Instance Methods' do
     context '#never_ending?' do
