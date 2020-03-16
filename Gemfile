@@ -25,6 +25,12 @@ gem 'bootsnap', '>= 1.4.2', require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
 
+# This gem is a port of Perl's Data::Faker library that generates fake data.
+gem 'faker', git: 'https://github.com/faker-ruby/faker.git', branch: 'master'
+
+# Week of month is a gem which extends Date and Time class with useful methods.
+gem 'week_of_month'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -35,6 +41,16 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+end
+
+group :test do
+  gem 'shoulda', '~> 3.5'
+  # Clean Database before/after test suites
+  gem 'database_cleaner', '~> 1.7'
+  # Create records for Test Env
+  gem 'factory_bot_rails', '~> 5.0', '>= 5.0.1'
+  # Test with rspec for Easy Testing
+  gem 'rspec-rails', '~> 3.7', '>= 3.7.2'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
