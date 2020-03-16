@@ -186,5 +186,5 @@ end
 #  recurring_end_date       :date
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
-#  recurring_option_trigger :stringg
+#  recurring_option_trigger :string
 #
